@@ -81,7 +81,7 @@ Question:
 """
 
         headers = {
-            "Authorization": f"Bearer {API_KEY}",
+            "Authorization": f"Bearer {groq_api_key}",
             "Content-Type": "application/json"
         }
 
