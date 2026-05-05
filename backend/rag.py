@@ -5,13 +5,16 @@ from pypdf import PdfReader
 import uuid
 from dotenv import load_dotenv
 import os
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 load_dotenv()
 
 
 # Vector DB
 client = chromadb.PersistentClient(path="chroma_db")
-collection = client.get_or_create_collection(name="logistics_docs")
+# Collection name
+COLLECTION_NAME = "logistics_docs"
+collection = client.get_or_create_collection(name=COLLECTION_NAME)
 
 # Embedding model
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -32,25 +35,41 @@ def extract_text(pdf_path):
     return text
 
 
-def chunk_text(text, size=500):
-    chunks = []
-    for i in range(0, len(text), size):
-        chunks.append(text[i:i+size])
-    return chunks
+
 
 
 def process_pdf(path):
+    # 1. Clear old data (User wants to chat with the current document)
+    global collection
+    try:
+        client.delete_collection(name=COLLECTION_NAME)
+        collection = client.create_collection(name=COLLECTION_NAME)
+        print(f"Collection {COLLECTION_NAME} reset.")
+    except Exception as e:
+        print(f"Error resetting collection: {e}")
+
+    # 2. Extract text
     text = extract_text(path)
-    chunks = chunk_text(text)
+    
+    # 3. Use Recursive Splitter for better context preservation
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=100,
+        length_function=len,
+    )
+    chunks = text_splitter.split_text(text)
+    print(f"Split document into {len(chunks)} chunks.")
 
-    for chunk in chunks:
-        embedding = model.encode(chunk).tolist()
-
-        collection.add(
-            ids=[str(uuid.uuid4())],
-            documents=[chunk],
-            embeddings=[embedding]
-        )
+    # 4. Batch add for performance
+    ids = [str(uuid.uuid4()) for _ in chunks]
+    embeddings = model.encode(chunks).tolist()
+    
+    collection.add(
+        ids=ids,
+        documents=chunks,
+        embeddings=embeddings
+    )
+    print("Successfully added chunks to ChromaDB.")
 
 
 def ask_question(query):
@@ -59,7 +78,7 @@ def ask_question(query):
 
         results = collection.query(
             query_embeddings=[query_embedding],
-            n_results=3
+            n_results=5  # Increased context window
         )
 
         docs = results["documents"][0]

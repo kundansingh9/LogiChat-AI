@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: logichat-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/knowledge_repo:/app/knowledge_repo
+      - ./backend/chroma_db:/app/chroma_db
+
+  frontend:
+    build: ./frontend
+    container_name: logichat-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  go-app:
+    build: ./go-logistics-app
+    container_name: logistics-go-service
+    ports:
+      - "8080:8080"

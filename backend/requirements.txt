@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+chromadb
+sentence-transformers
+pypdf
+python-dotenv
+requests
+crewai
+langchain-community
+langchain-groq
+langchain-text-splitters
+litellm

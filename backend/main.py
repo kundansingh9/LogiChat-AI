@@ -1,8 +1,10 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from rag import process_pdf, ask_question
+from research_agent import LogisticsResearcher
 
 app = FastAPI()
+researcher = LogisticsResearcher()
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,3 +36,11 @@ async def upload_pdf(file: UploadFile = File(...)):
 def chat(query: str):
     answer = ask_question(query)
     return {"response": answer}
+
+@app.get("/research")
+def research(query: str):
+    try:
+        result = researcher.research(query)
+        return result
+    except Exception as e:
+        return {"error": str(e)}
