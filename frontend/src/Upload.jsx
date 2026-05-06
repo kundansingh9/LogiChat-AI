@@ -8,7 +8,7 @@ function Upload() {
     const formData = new FormData();
     formData.append("file", file);
 
-    await axios.post("http://localhost:8000/upload", formData);
+    await axios.post("http://backend:8000/upload", formData);
     alert("Uploaded");
   };
 

@@ -15,7 +15,7 @@ function Research() {
 
     try {
       const res = await axios.get(
-        `http://localhost:8000/research?query=${query}`
+        `http://backend:8000/research?query=${query}`
       );
       setResult(res.data);
     } catch (err) {
@@ -41,8 +41,8 @@ function Research() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <button 
-            onClick={handleResearch} 
+          <button
+            onClick={handleResearch}
             className="btn btn-ask"
             disabled={loading}
           >

@@ -7,7 +7,7 @@ function Chat() {
 
   const ask = async () => {
     const res = await axios.get(
-      `http://localhost:8000/chat?query=${query}`
+      `http://backend:8000/chat?query=${query}`
     );
 
     setResponse(res.data.response);
@@ -19,7 +19,7 @@ function Chat() {
         <h2>Ask AI</h2>
         <p>Query your uploaded logistics documents</p>
       </div>
-      
+
       <div className="chat-container">
         <div className="input-group">
           <input
