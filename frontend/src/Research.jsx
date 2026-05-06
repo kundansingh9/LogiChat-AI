@@ -15,7 +15,7 @@ function Research() {
 
     try {
       const res = await axios.get(
-        `http://backend:8000/research?query=${query}`
+        `http://34.229.44.212:8000/research?query=${query}`
       );
       setResult(res.data);
     } catch (err) {

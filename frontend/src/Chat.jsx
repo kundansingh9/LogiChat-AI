@@ -7,7 +7,7 @@ function Chat() {
 
   const ask = async () => {
     const res = await axios.get(
-      `http://backend:8000/chat?query=${query}`
+      `http://34.229.44.212:8000/chat?query=${query}`
     );
 
     setResponse(res.data.response);
